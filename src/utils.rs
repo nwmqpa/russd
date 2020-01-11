@@ -6,7 +6,7 @@ use std::path::{Path, PathBuf};
 use website_icon_extract::extract_icons;
 
 pub fn get_icon(link: &str) -> PathBuf {
-    let icons = extract_icons(link, "", 2).unwrap_or(vec![String::from(
+    let icons = extract_icons(link, "", 2).unwrap_or_else(|_| vec![String::from(
         "https://www.mozilla.org/media/img/favicons/firefox/browser/favicon.f093404c0135.ico",
     )]);
     let icons = icons

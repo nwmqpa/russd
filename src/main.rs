@@ -16,12 +16,15 @@ use crate::config::{Post, RSS};
 fn daemon_runtime(mut config: Config) -> std::io::Result<()> {
     loop {
         for feed in &config.rss_feeds {
-            let previous_date = config.feeds_date.entry(String::from(feed)).or_insert(
-                FixedOffset::east(0).from_utc_datetime(&NaiveDateTime::from_timestamp(0, 0)),
-            );
+            let previous_date = config
+                .feeds_date
+                .entry(String::from(feed))
+                .or_insert_with(|| {
+                    FixedOffset::east(0).from_utc_datetime(&NaiveDateTime::from_timestamp(0, 0))
+                });
             let response = reqwest::blocking::get(feed).expect("Request failed");
             let rss_feed: RSS = from_str(&response.text().unwrap()).unwrap();
-            let mut max_date = previous_date.clone();
+            let mut max_date = *previous_date;
 
             for item in rss_feed.channel.item {
                 match DateTime::parse_from_rfc2822(&item.pub_date) {
@@ -44,13 +47,10 @@ fn daemon_runtime(mut config: Config) -> std::io::Result<()> {
                         .timeout(3)
                         .show()
                         .unwrap()
-                        .wait_for_action(|action| match action {
-                            "default" => {
-                                if !webbrowser::open(&post.link).is_ok() {
-                                    println!("Could not open link {}", &post.link);
+                        .wait_for_action(|action| if let "default" = action {
+                                if webbrowser::open(&post.link).is_err() {
+                                    eprintln!("Could not open link {}", &post.link);
                                 }
-                            }
-                            _ => (),
                         })
                 });
             }
@@ -66,7 +66,6 @@ fn daemon_runtime(mut config: Config) -> std::io::Result<()> {
         }
         std::thread::sleep(std::time::Duration::from_secs(20));
     }
-    unreachable!()
 }
 
 fn main() -> std::io::Result<()> {

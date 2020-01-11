@@ -105,7 +105,7 @@ pub fn setup(
     let file = std::fs::read_to_string(CFG_DIR.join("russd.conf"))?;
     let rss_feeds = file
         .lines()
-        .filter(|x| x.len() != 0)
+        .filter(|x| !x.is_empty())
         .map(String::from)
         .collect();
     Ok(Config {
