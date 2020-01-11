@@ -1,16 +1,15 @@
 use chrono::prelude::*;
-use std::io::Lines;
+
 use daemonize::Daemonize;
 use notify_rust::{Notification, Timeout};
 use serde::{Deserialize, Serialize};
-use serde_xml_rs::from_str;
+
 use std::collections::HashMap;
 use std::fs::File;
-use std::io::copy;
+
 use std::path::{Path, PathBuf};
 use tempfile::{tempdir, TempDir};
-use webbrowser;
-use website_icon_extract::extract_icons;
+
 use crate::utils;
 
 lazy_static! {
@@ -65,7 +64,6 @@ impl From<&Post> for Notification {
     }
 }
 
-
 impl From<RSSItem> for Post {
     fn from(item: RSSItem) -> Post {
         Post {
@@ -77,7 +75,8 @@ impl From<RSSItem> for Post {
     }
 }
 
-pub fn setup() -> Result<(Vec<String>, HashMap<String, DateTime<FixedOffset>>, PathBuf), std::io::Error> {
+pub fn setup(
+) -> Result<(Vec<String>, HashMap<String, DateTime<FixedOffset>>, PathBuf), std::io::Error> {
     let (config_file_path, dates_file_path) =
         (CFG_DIR.join("russd.conf"), CFG_DIR.join("dates.json"));
 
@@ -89,7 +88,7 @@ pub fn setup() -> Result<(Vec<String>, HashMap<String, DateTime<FixedOffset>>, P
         File::create(config_file_path)?;
     }
 
-    let mut feeds_date = if !Path::new(&dates_file_path).exists() {
+    let feeds_date = if !Path::new(&dates_file_path).exists() {
         let feeds_date = HashMap::new();
         std::fs::write(
             &dates_file_path,
@@ -103,7 +102,11 @@ pub fn setup() -> Result<(Vec<String>, HashMap<String, DateTime<FixedOffset>>, P
 
     let file = std::fs::read_to_string(CFG_DIR.join("russd.conf"))?;
     let lines = file.lines();
-    Ok((lines.filter(|x| x.len() != 0).map(String::from).collect(), feeds_date, dates_file_path))
+    Ok((
+        lines.filter(|x| x.len() != 0).map(String::from).collect(),
+        feeds_date,
+        dates_file_path,
+    ))
 }
 
 pub fn daemon() -> Result<Daemonize<&'static str>, std::io::Error> {

@@ -1,12 +1,8 @@
 use chrono::prelude::*;
-use notify_rust::{Notification, Timeout};
-use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
-use std::fs::File;
-use std::io::copy;
-use std::path::{Path, PathBuf};
+use notify_rust::Notification;
+
 use webbrowser;
-use website_icon_extract::extract_icons;
+
 use serde_json::from_str;
 
 #[macro_use]
@@ -15,8 +11,7 @@ extern crate lazy_static;
 mod config;
 mod utils;
 
-use crate::config::TMP_DIR;
-use crate::config::{Post, RSSItem, RSSChannel, RSS};
+use crate::config::{Post, RSS};
 
 fn main() -> std::io::Result<()> {
     let (feeds, mut feeds_date, dates_file_path) = config::setup()?;

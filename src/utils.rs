@@ -1,16 +1,9 @@
 use crate::config::TMP_DIR;
-use crate::utils;
-use chrono::prelude::*;
-use daemonize::Daemonize;
-use notify_rust::{Notification, Timeout};
-use serde::{Deserialize, Serialize};
-use serde_xml_rs::from_str;
-use std::collections::HashMap;
+
 use std::fs::File;
 use std::io::copy;
 use std::path::{Path, PathBuf};
-use tempfile::{tempdir, TempDir};
-use webbrowser;
+
 use website_icon_extract::extract_icons;
 
 pub fn get_icon(link: &str) -> PathBuf {
