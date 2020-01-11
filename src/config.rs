@@ -1,16 +1,12 @@
+use crate::utils;
 use chrono::prelude::*;
-
 use daemonize::Daemonize;
 use notify_rust::{Notification, Timeout};
 use serde::{Deserialize, Serialize};
-
 use std::collections::HashMap;
 use std::fs::File;
-
 use std::path::{Path, PathBuf};
 use tempfile::{tempdir, TempDir};
-
-use crate::utils;
 
 lazy_static! {
     pub static ref TMP_DIR: TempDir = tempdir().expect("Cannot create temp dir");
@@ -18,6 +14,12 @@ lazy_static! {
         .unwrap()
         .config_dir()
         .join("russd");
+}
+
+pub struct Config {
+    pub rss_feeds: Vec<String>,
+    pub dates_file_path: PathBuf,
+    pub feeds_date: HashMap<String, DateTime<FixedOffset>>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -76,7 +78,7 @@ impl From<RSSItem> for Post {
 }
 
 pub fn setup(
-) -> Result<(Vec<String>, HashMap<String, DateTime<FixedOffset>>, PathBuf), std::io::Error> {
+) -> Result<Config, std::io::Error> {
     let config_file_path = CFG_DIR.join("russd.conf");
     let dates_file_path = CFG_DIR.join("dates.json");
 
@@ -101,12 +103,16 @@ pub fn setup(
     };
 
     let file = std::fs::read_to_string(CFG_DIR.join("russd.conf"))?;
-    let lines = file.lines();
-    Ok((
-        lines.filter(|x| x.len() != 0).map(String::from).collect(),
+    let rss_feeds = file
+        .lines()
+        .filter(|x| x.len() != 0)
+        .map(String::from)
+        .collect();
+    Ok(Config {
+        rss_feeds,
         feeds_date,
         dates_file_path,
-    ))
+    })
 }
 
 pub fn daemon() -> Result<Daemonize<&'static str>, std::io::Error> {

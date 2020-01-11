@@ -1,5 +1,4 @@
 use crate::config::TMP_DIR;
-
 use std::fs::File;
 use std::io::copy;
 use std::path::{Path, PathBuf};
@@ -23,11 +22,11 @@ pub fn get_icon(link: &str) -> PathBuf {
     )
     .exists()
     {
-        return TMP_DIR
+        TMP_DIR
             .path()
-            .join(icon_link.replace("/", "_").replace("http", ""));
+            .join(icon_link.replace("/", "_").replace("http", ""))
     } else {
-        return download_file(icon_link);
+        download_file(icon_link)
     }
 }
 
