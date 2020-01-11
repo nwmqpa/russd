@@ -42,7 +42,7 @@ fn daemon_runtime(mut config: Config) -> std::io::Result<()> {
             let rss_feed: RSS = from_str(&response.text().unwrap()).unwrap();
             let mut max_date = *previous_date;
 
-            notify_from_feed(rss_feed, &mut max_date, previous_date);
+            notify_from_rss(rss_feed, &mut max_date, previous_date);
             (*config
                 .feeds_date
                 .entry(String::from(feed))
@@ -57,28 +57,25 @@ fn daemon_runtime(mut config: Config) -> std::io::Result<()> {
     }
 }
 
-fn notify_from_feed(
+fn notify_from_rss(
     rss_feed: RSS,
     max_date: &mut DateTime<FixedOffset>,
     previous_date: &mut DateTime<FixedOffset>,
 ) {
     for item in rss_feed.channel.item {
-        match DateTime::parse_from_rfc2822(&item.pub_date) {
-            Ok(date) => {
-                if &date <= previous_date {
-                    continue;
-                }
-                if date > *max_date {
-                    *max_date = date;
-                }
+        if let Ok(date) = DateTime::parse_from_rfc2822(&item.pub_date) {
+            if &date <= previous_date {
+                continue;
             }
-            Err(_) => continue,
+            if date > *max_date {
+                *max_date = date;
+            }
+        } else {
+            continue;
         }
 
         let post = Post::from(item);
-
         let mut notification = Notification::from(&post);
-
         std::thread::spawn(move || {
             notification
                 .timeout(3)
