@@ -33,7 +33,7 @@ fn main() -> std::io::Result<()> {
                 let mut max_date = previous_date.clone();
 
                 for item in rss_feed.channel.item {
-                    match DateTime::parse_from_rfc2822(&item.pubDate) {
+                    match DateTime::parse_from_rfc2822(&item.pub_date) {
                         Ok(date) => {
                             if &date <= previous_date {
                                 continue;

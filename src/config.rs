@@ -25,7 +25,7 @@ pub struct RSSItem {
     pub title: String,
     pub link: String,
     pub description: String,
-    pub pubDate: String,
+    pub pub_date: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -77,8 +77,8 @@ impl From<RSSItem> for Post {
 
 pub fn setup(
 ) -> Result<(Vec<String>, HashMap<String, DateTime<FixedOffset>>, PathBuf), std::io::Error> {
-    let (config_file_path, dates_file_path) =
-        (CFG_DIR.join("russd.conf"), CFG_DIR.join("dates.json"));
+    let config_file_path = CFG_DIR.join("russd.conf");
+    let dates_file_path = CFG_DIR.join("dates.json");
 
     if !CFG_DIR.exists() {
         std::fs::create_dir(CFG_DIR.as_os_str())?;
