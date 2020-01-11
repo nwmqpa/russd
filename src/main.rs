@@ -76,13 +76,17 @@ fn notify_from_rss(
         let post = Post::from(item);
         let mut notification = Notification::from(&post);
         std::thread::spawn(move || {
-            notification.show().unwrap().wait_for_action(|action| {
-                if let "default" = action {
-                    if webbrowser::open(&post.link).is_err() {
-                        eprintln!("Could not open the link {}.", &post.link);
+            notification
+                .timeout(-1)
+                .show()
+                .unwrap()
+                .wait_for_action(|action| {
+                    if let "default" = action {
+                        if webbrowser::open(&post.link).is_err() {
+                            eprintln!("Could not open the link {}.", &post.link);
+                        }
                     }
-                }
-            })
+                })
         });
     }
 }
