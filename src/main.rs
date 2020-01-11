@@ -1,6 +1,6 @@
 use crate::config::Config;
 use chrono::prelude::*;
-use daemonize::Daemonize;
+
 use notify_rust::Notification;
 use serde_json::from_str;
 use webbrowser;
@@ -66,11 +66,11 @@ fn daemon_runtime(mut config: Config) -> std::io::Result<()> {
         }
         std::thread::sleep(std::time::Duration::from_secs(20));
     }
-    Ok(())
+    unreachable!()
 }
 
 fn main() -> std::io::Result<()> {
-    let mut config = config::setup()?;
+    let config = config::setup()?;
     let daemon = config::daemon()?;
 
     if config.rss_feeds.is_empty() {
