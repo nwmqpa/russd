@@ -2,7 +2,7 @@ use crate::config::Config;
 use chrono::prelude::*;
 
 use notify_rust::Notification;
-use serde_json::from_str;
+use serde_xml_rs::from_str;
 use webbrowser;
 
 #[macro_use]
@@ -38,7 +38,7 @@ fn daemon_runtime(mut config: Config) -> std::io::Result<()> {
                 .or_insert_with(|| {
                     FixedOffset::east(0).from_utc_datetime(&NaiveDateTime::from_timestamp(0, 0))
                 });
-            let response = reqwest::blocking::get(feed).expect("Request failed");
+            let response = reqwest::blocking::get(feed).expect("Request to failed.");
             let rss_feed: RSS = from_str(&response.text().unwrap()).unwrap();
             let mut max_date = *previous_date;
 
@@ -47,7 +47,6 @@ fn daemon_runtime(mut config: Config) -> std::io::Result<()> {
                 .feeds_date
                 .entry(String::from(feed))
                 .or_insert(max_date)) = max_date;
-            println!("{:?}", config.feeds_date);
             std::fs::write(
                 &config.dates_file_path,
                 serde_json::to_string(&config.feeds_date).unwrap(),
@@ -77,17 +76,13 @@ fn notify_from_rss(
         let post = Post::from(item);
         let mut notification = Notification::from(&post);
         std::thread::spawn(move || {
-            notification
-                .timeout(3)
-                .show()
-                .unwrap()
-                .wait_for_action(|action| {
-                    if let "default" = action {
-                        if webbrowser::open(&post.link).is_err() {
-                            eprintln!("Could not open link {}", &post.link);
-                        }
+            notification.show().unwrap().wait_for_action(|action| {
+                if let "default" = action {
+                    if webbrowser::open(&post.link).is_err() {
+                        eprintln!("Could not open the link {}.", &post.link);
                     }
-                })
+                }
+            })
         });
     }
 }

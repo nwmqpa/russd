@@ -27,6 +27,7 @@ pub struct RSSItem {
     pub title: String,
     pub link: String,
     pub description: String,
+    #[serde(rename = "pubDate")]
     pub pub_date: String,
 }
 
