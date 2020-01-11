@@ -47,10 +47,12 @@ fn daemon_runtime(mut config: Config) -> std::io::Result<()> {
                         .timeout(3)
                         .show()
                         .unwrap()
-                        .wait_for_action(|action| if let "default" = action {
+                        .wait_for_action(|action| {
+                            if let "default" = action {
                                 if webbrowser::open(&post.link).is_err() {
                                     eprintln!("Could not open link {}", &post.link);
                                 }
+                            }
                         })
                 });
             }

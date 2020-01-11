@@ -77,8 +77,7 @@ impl From<RSSItem> for Post {
     }
 }
 
-pub fn setup(
-) -> Result<Config, std::io::Error> {
+pub fn setup() -> Result<Config, std::io::Error> {
     let config_file_path = CFG_DIR.join("russd.conf");
     let dates_file_path = CFG_DIR.join("dates.json");
 
