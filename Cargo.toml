@@ -1,7 +1,7 @@
 [package]
 name = "russd"
 version = "0.1.0"
-authors = ["Thomas Nicollet <thomas.nicollet@epitech.eu>"]
+authors = ["Thomas Nicollet <thomas.nicollet@epitech.eu>", "Alexandre Fourcat <alexandre.fourcat@epitech.eu>"]
 edition = "2018"
 license = "MIT"
 description = "A new aggregator made in rust"
